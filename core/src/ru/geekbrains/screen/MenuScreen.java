@@ -10,30 +10,23 @@ import ru.geekbrains.base.Base2DScreen;
 
 public class MenuScreen extends Base2DScreen{
 
-    private SpriteBatch batch;
+
     private Texture img;
 
     private Vector2 pos;
-
-
-    private boolean isTouchDown = false;
-    private boolean isGoToTargerMousePos = false;
-    private boolean isKeyDownPressed = false;
-    private boolean isKeyDownHolding = false;
-    private Vector2 targetMouse;
-    private Vector2 vTargetMouse;
-    private Vector2 vKeyDown;
+    private Vector2 touch;
+    private Vector2 v;
+    private Vector2 buf;
 
 
     @Override
     public void show() {
         super.show();
-        batch = new SpriteBatch();
         img = new Texture("sun.png");
         pos = new Vector2(0,0);
-        targetMouse = new Vector2(pos.x,pos.y);
-        vTargetMouse = new Vector2(0,0);
-        vKeyDown = new Vector2(0,0);
+        touch = new Vector2();
+        v = new Vector2();
+        buf = new Vector2();
     }
 
     @Override
@@ -41,75 +34,29 @@ public class MenuScreen extends Base2DScreen{
         super.render(delta);
         Gdx.gl.glClearColor(0.128f, 0.53f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        buf.set(touch);
+        if (buf.sub(pos).len() > v.len()) {
+            pos.add(v);
+        } else {
+            pos.set(touch);
+        }
         batch.begin();
-        batch.draw(img, pos.x, pos.y);
+        batch.draw(img, pos.x, pos.y, 21f, 21f);
         batch.end();
-        if(isTouchDown){
-            isTouchDown= false;
-            targetMouse.set(getCoordX(),getCoordY());
-            vTargetMouse = targetMouse.cpy().sub(pos);
-            vTargetMouse.nor();
-            vTargetMouse.scl(2);
-            System.out.println("Новая цель: x = "+getCoordX()+" y = "+getCoordY());
-            isGoToTargerMousePos = true;
-        }
-        if(isGoToTargerMousePos) {
-            if (Math.round(pos.x) != targetMouse.x && Math.round(pos.y) != targetMouse.y) {
-                pos.add(vTargetMouse);
-            }else {
-                isGoToTargerMousePos = false;
-                vTargetMouse.set(0,0);
-            }
-        }
-        if(isKeyDownPressed){
-            if(getKeyDownCode() == 19){
-                vKeyDown.set(0,2);
-            }
-            if(getKeyDownCode() == 20){
-                vKeyDown.set(0,-2);
-            }
-            if(getKeyDownCode() == 21){
-                vKeyDown.set(-2,0);
-            }
-            if(getKeyDownCode() == 22){
-                vKeyDown.set(2,0);
-            }
-            isKeyDownHolding = true;
-            isKeyDownPressed = false;
-        }
-        if(isKeyDownHolding){
-            pos.add(vKeyDown);
-        }
-
-
 
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
         img.dispose();
         super.dispose();
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        isTouchDown = true;
-        return super.touchDown(screenX, screenY, pointer, button);
+    public boolean touchDown(Vector2 touch, int pointer) {
+        this.touch = touch;
+        v.set(touch.cpy().sub(pos).scl(0.01f));
+        return false;
     }
 
-    @Override
-    public boolean keyDown(int keycode) {
-        if(isGoToTargerMousePos){
-            isGoToTargerMousePos = false;
-        }
-        isKeyDownPressed = true;
-        return super.keyDown(keycode);
-    }
-
-    @Override
-    public boolean keyUp(int keycode) {
-        isKeyDownHolding = false;
-        return super.keyUp(keycode);
-    }
 }
