@@ -19,6 +19,14 @@ public class Enemy extends Ship {
     private State state;
     private Vector2 descentV = new Vector2(0, -0.15f);
 
+    private MainShip mainShip;
+
+    private Vector2 bulletVBottom = new Vector2();
+    float shootAngel;
+    Vector2 enemyPos = new Vector2();
+    Vector2 enemyFace = new Vector2();
+    Vector2 targetPos = new Vector2();
+
     public Enemy(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound shootSound) {
         super(shootSound);
         this.bulletPool = bulletPool;
@@ -26,6 +34,7 @@ public class Enemy extends Ship {
         this.worldBounds = worldBounds;
         this.v.set(v0);
     }
+
 
     @Override
     public void update(float delta) {
@@ -62,7 +71,8 @@ public class Enemy extends Ship {
             int bulletDamage,
             float reloadInterval,
             float height,
-            int hp
+            int hp,
+            MainShip mainShip
     ) {
         this.regions = regions;
         this.v0.set(v0);
@@ -76,6 +86,7 @@ public class Enemy extends Ship {
         setHeightProportion(height);
         v.set(descentV);
         state = State.DESCENT;
+        this.mainShip = mainShip;
     }
 
     public boolean isBulletCollision(Rect bullet) {
@@ -91,6 +102,55 @@ public class Enemy extends Ship {
         boom();
         hp = 0;
         super.destroy();
+    }
+
+    @Override
+    protected void shoot() {
+//        float shootAngel;
+//        Vector2 enemyPos = new Vector2();
+//        Vector2 enemyFace = new Vector2();
+//        Vector2 targetPos = new Vector2();
+
+        Bullet bullet = bulletPool.obtain();
+        bulletVBottom = bulletV.cpy();
+
+//        Проверка правильно ли составил формулу расчета, взял данные из этой статьи:
+//        https://habr.com/post/131931/
+//        Скалярное произведение векторов
+//        enemyFace.set(1,1);
+//        System.out.println("enemyFace = "+enemyFace.x+" "+enemyFace.y);
+//        enemyFace.nor();
+//        enemyPos.set(1,3);
+//        System.out.println("enemyPos = "+enemyPos.x+" "+enemyPos.y);
+//        targetPos.set(3,2);
+//        System.out.println("targetPos = "+targetPos.x+" "+targetPos.y);
+//        targetPos.sub(enemyPos);
+//        targetPos.nor();
+//        shootAngel = (float) ((Math.acos(enemyFace.dot(targetPos)) * 180) / Math.PI);
+//        System.out.println("Shoot (float) angel : " + shootAngel);
+//        Как в статье получается приблизительно 72 градуса
+
+        System.out.println("------------------------------------------------------------");
+        enemyFace.set(v.x,v.y);
+        System.out.println("enemyFace = "+enemyFace.x+" "+enemyFace.y);
+        enemyFace.nor();
+        enemyPos.set(pos.x,pos.y);
+        System.out.println("enemyPos = "+enemyPos.x+" "+enemyPos.y);
+        targetPos.set(mainShip.pos.x,mainShip.pos.y);
+        System.out.println("targetPos = "+targetPos.x+" "+targetPos.y);
+        targetPos.sub(enemyPos);
+        targetPos.nor();
+        shootAngel = (float) ((Math.acos(enemyFace.dot(targetPos)) * 180) / Math.PI);
+        System.out.println("Shoot (float) angel : " + shootAngel);
+        System.out.println("------------------------------------------------------------");
+
+        if(mainShip.pos.x < pos.x){
+            shootAngel = - shootAngel;
+        }
+
+        bullet.set(this, bulletRegion, pos, bulletV.rotate(shootAngel), bulletHeight, worldBounds, bulletDamage);
+        bulletV = bulletVBottom.cpy();
+        super.shoot();
     }
 
 }

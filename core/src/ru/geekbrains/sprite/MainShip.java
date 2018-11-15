@@ -24,17 +24,24 @@ public class MainShip extends Ship {
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
 
-    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound shootSound) {
+    public MainShip(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound shootSound) {
         super(atlas.findRegion("main_ship"), 1, 2, 2, shootSound);
         setHeightProportion(0.15f);
         this.bulletPool = bulletPool;
+        this.bulletRegion = atlas.findRegion("bulletMainShip");
+        this.explosionPool = explosionPool;
+        this.worldBounds = worldBounds;
+        startNewGame();
+    }
+
+    public void startNewGame() {
+        pos.x = worldBounds.pos.x;
         this.bulletV.set(0, 0.5f);
         this.bulletHeight = 0.01f;
         this.bulletDamage = 1;
         this.reloadInterval = 0.2f;
-        this.bulletRegion = atlas.findRegion("bulletMainShip");
-        this.explosionPool = explosionPool;
         this.hp = 100;
+        flushDestroy();
     }
 
     @Override
@@ -43,9 +50,7 @@ public class MainShip extends Ship {
         pos.mulAdd(v, delta);
         reloadTimer += delta;
         if (reloadTimer >= reloadInterval) {
-            if(!isDestroyed()){
-                shoot();
-            }
+            shoot();
             reloadTimer = 0f;
         }
         if (getRight() > worldBounds.getRight()) {
@@ -168,6 +173,13 @@ public class MainShip extends Ship {
         boom();
         hp = 0;
         super.destroy();
+    }
+
+    @Override
+    protected void shoot() {
+        Bullet bullet = bulletPool.obtain();
+        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
+        super.shoot();
     }
 
 }

@@ -46,11 +46,22 @@ public abstract class Ship extends Sprite  {
         this.worldBounds = worldBounds;
     }
 
+
     protected void shoot() {
-        Bullet bullet = bulletPool.obtain();
-        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
         shootSound.play();
+//        Bullet bullet = bulletPool.obtain();
+//        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
+//        shootSound.play();
     }
+
+//    protected void shoot() {
+//        Bullet bullet = bulletPool.obtain();
+//        Vector2 bulletVNormal = bulletV.cpy();
+//        bullet.set(this, bulletRegion, pos, bulletV.rotate(angel), bulletHeight, worldBounds, bulletDamage);
+//        bulletV = bulletVNormal.cpy();
+//        angel = -angel;
+//        shootSound.play();
+//    }
 
     @Override
     public void update(float delta) {
@@ -73,6 +84,10 @@ public abstract class Ship extends Sprite  {
         if (hp <= 0) {
             destroy();
         }
+    }
+
+    public int getHp() {
+        return hp;
     }
 
 }
