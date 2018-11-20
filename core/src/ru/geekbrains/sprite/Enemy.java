@@ -106,10 +106,6 @@ public class Enemy extends Ship {
 
     @Override
     protected void shoot() {
-//        float shootAngel;
-//        Vector2 enemyPos = new Vector2();
-//        Vector2 enemyFace = new Vector2();
-//        Vector2 targetPos = new Vector2();
 
         Bullet bullet = bulletPool.obtain();
         bulletVBottom = bulletV.cpy();

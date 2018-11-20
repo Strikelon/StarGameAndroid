@@ -49,19 +49,7 @@ public abstract class Ship extends Sprite  {
 
     protected void shoot() {
         shootSound.play();
-//        Bullet bullet = bulletPool.obtain();
-//        bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
-//        shootSound.play();
     }
-
-//    protected void shoot() {
-//        Bullet bullet = bulletPool.obtain();
-//        Vector2 bulletVNormal = bulletV.cpy();
-//        bullet.set(this, bulletRegion, pos, bulletV.rotate(angel), bulletHeight, worldBounds, bulletDamage);
-//        bulletV = bulletVNormal.cpy();
-//        angel = -angel;
-//        shootSound.play();
-//    }
 
     @Override
     public void update(float delta) {
